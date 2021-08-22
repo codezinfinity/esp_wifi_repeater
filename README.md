@@ -161,7 +161,7 @@ Any part of a command line input after a single "#" until the end of the line wi
 - gpio [0-16] trigger none: clears the link
 
 ### Chip Config
-- set speed [80|160]: sets the CPU clock frequency (default 80 Mhz)
+- set speed [80|160]: sets the CPU clock frequency (default 160 Mhz)
 - sleep _seconds_: Put ESP into deep sleep for the specified amount of seconds. Valid values between 1 and 4294 (aprox. 71 minutes)
 - set status_led _GPIOno_: selects a GPIO pin for the status LED (default 2, >16 disabled)
 - set hw_reset _GPIOno_: selects a GPIO pin for a hardware factory reset (>16 disabled, default)
@@ -399,7 +399,16 @@ You can send the ESP to sleep manually once by using the "sleep" command.
 Caution: If you save a _vmin_ value higher than the max supply voltage to flash, the repeater will immediately shutdown every time after reboot. Then you have to wipe out the whole config by flashing blank.bin (or any other file) to 0x0c000.
 
 # Building and Flashing
-To build this binary you download and install the esp-open-sdk (I suggest this version with base NONOS SDK 2.2: https://github.com/xxxajk/esp-open-sdk). Make sure, you can compile and download the included "blinky" example.
+If you have Docker installed, the easiest way to get access to the full build environment is to connect your ESP8266 to /dev/ttyUSB0 and run the image using:
+```
+git clone https://github.com/martin-ger/esp_wifi_repeater.git
+docker run -it --rm --device=/dev/ttyUSB0 -v $(pwd)/esp_wifi_repeater:/home/esp/esp_wifi_repeater martinfger/iot_devel:1.0
+cd esp_wifi_repeater
+make
+make flash
+``` 
+
+To set up the build environment from scratch and build this binary download and install the esp-open-sdk (I suggest this version with base NONOS SDK 2.2: https://github.com/xxxajk/esp-open-sdk). Make sure, you can compile and download the included "blinky" example.
 
 Then download this source tree in a separate directory and adjust the BUILD_AREA variable in the Makefile and any desired options in user/user_config.h. Changes of the default configuration can be made in user/config_flash.c. Build the esp_wifi_repeater firmware with "make". "make flash" flashes it onto an esp8266.
 
@@ -445,4 +454,7 @@ If configured correctly, the update will start and the ESP will reboot with the 
 - Due to the limitations of the ESP's SoftAP implementation, there is a maximum of 8 simultaniously connected stations.
 - The ESP8266 requires a good power supply as it produces current spikes of up to 170 mA during transmit (typical average consumption is around 70 mA when WiFi is on). Check the power supply first, if your ESP runs unstable and reboots from time to time. A large capacitor between Vdd and Gnd can help if you experience problems here.
 - All firmware published after 17/Oct/2017 have been built with the patched version of the SDK 2.1.0 from Espressif that mitigates the KRACK (https://www.krackattacks.com/ ) attack.
+
+# Licenses
+The software is open source. Third party source files have their own license header. For all other files the MIT license applies.
 
